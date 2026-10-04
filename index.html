@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0891b2">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="آب‌پاک">
+<title>آب‌پاک | مدیریت تصفیه آب</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#eef2f7; --card:#ffffff; --text:#0f172a; --muted:#64748b;
+  --pri:#0891b2; --pri2:#0e7490; --green:#16a34a; --red:#e11d48; --amber:#d97706;
+  --border:#e2e8f0; --r:16px; --sh:0 2px 12px rgba(15,23,42,.07);
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#0b1220;--card:#111a2b;--text:#e6edf6;--muted:#93a4bb;--border:#1e2a3d;--sh:0 2px 12px rgba(0,0,0,.45)}
+}
+html,body{margin:0;padding:0}
+body{
+  font-family:"Vazirmatn","IRANSans",Tahoma,system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:var(--bg);color:var(--text);font-size:15px;line-height:1.8;
+  padding-bottom:96px;
+}
+button,input,textarea,select{font-family:inherit;font-size:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+input,textarea,select{
+  width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:12px;
+  background:var(--card);outline:none;transition:.15s;
+}
+input:focus,textarea:focus,select:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(8,145,178,.13)}
+textarea{resize:vertical}
+
+header.app{
+  position:sticky;top:0;z-index:20;
+  background:linear-gradient(135deg,#0891b2,#0e7490 60%,#155e75);
+  color:#fff;padding:14px 16px 18px;border-radius:0 0 24px 24px;
+  box-shadow:0 6px 22px rgba(8,145,178,.28);
+}
+.hrow{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{font-size:19px;font-weight:800;letter-spacing:-.3px}
+.sub{font-size:12.5px;opacity:.9;margin-top:2px}
+.hstat{text-align:center;background:rgba(255,255,255,.16);padding:7px 14px;border-radius:14px;backdrop-filter:blur(6px)}
+.hstat .hs-l{font-size:11px;opacity:.9}
+.hstat .hs-v{font-size:15px;font-weight:800}
+#installBtn{display:none;margin-top:10px;background:rgba(255,255,255,.2);border:0;color:#fff;
+  padding:7px 14px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer}
+
+main{padding:14px 14px 0;max-width:640px;margin:0 auto}
+.page{display:none;animation:fade .25s ease}
+.page.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.sec{font-size:15px;font-weight:800;margin:22px 4px 10px;display:flex;align-items:center;gap:8px}
+.badge{background:var(--red);color:#fff;border-radius:20px;padding:1px 9px;font-size:12px;font-weight:700}
+.empty{text-align:center;color:var(--muted);padding:26px 10px;font-size:14px;
+  background:var(--card);border-radius:var(--r);border:1.5px dashed var(--border)}
+
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.stat{background:var(--card);border-radius:var(--r);padding:11px 6px;text-align:center;
+  box-shadow:var(--sh);border-top:3px solid var(--border)}
+.stat span{display:block;font-size:11px;color:var(--muted);margin-bottom:3px}
+.stat b{font-size:12.5px;font-weight:800;word-break:break-word;line-height:1.4;display:block}
+.stat.in{border-top-color:var(--green)} .stat.in b{color:var(--green)}
+.stat.out{border-top-color:var(--red)} .stat.out b{color:var(--red)}
+.stat.net{border-top-color:var(--pri)} .stat.net b{color:var(--pri)}
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:14px;margin-bottom:10px}
+
+.due-card{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:13px 14px;
+  margin-bottom:10px;border-right:4px solid var(--red);display:flex;justify-content:space-between;
+  align-items:center;gap:10px}
+.due-card.soon{border-right-color:var(--amber)}
+.dn{font-weight:800;font-size:15.5px}
+.dp{font-size:13px;color:var(--pri);direction:ltr;text-align:right;font-weight:600}
+.da{font-size:12.5px;color:var(--muted);margin-top:3px}
+.dactions{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.mini{border:0;border-radius:10px;padding:7px 11px;font-size:12.5px;font-weight:700;cursor:pointer;
+  background:#f1f5f9;color:var(--text);white-space:nowrap}
+@media (prefers-color-scheme: dark){.mini{background:#1c2942}}
+.mini.ok{background:var(--green);color:#fff}
+.mini.call{background:var(--pri);color:#fff}
+
+.tx{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:14px;
+  padding:11px 13px;margin-bottom:8px;box-shadow:var(--sh)}
+.tx-main{flex:1;min-width:0}
+.tx-title{font-weight:700;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tx-sub{font-size:12px;color:var(--muted)}
+.tx-amt{font-weight:800;font-size:13.5px;white-space:nowrap;direction:rtl}
+.tx.in .tx-amt{color:var(--green)} .tx.out .tx-amt{color:var(--red)}
+.del{background:transparent;border:0;font-size:16px;cursor:pointer;opacity:.45;padding:4px}
+.del:active{opacity:1}
+
+.seg{display:flex;background:#e9eef5;border-radius:12px;padding:4px;gap:4px;margin-bottom:12px}
+@media (prefers-color-scheme: dark){.seg{background:#1a2438}}
+.seg button{flex:1;border:0;background:transparent;padding:9px;border-radius:9px;font-weight:700;
+  cursor:pointer;color:var(--muted);transition:.15s}
+.seg button.on{background:var(--card);color:var(--pri);box-shadow:0 1px 6px rgba(0,0,0,.1)}
+
+.cust{display:flex;align-items:center;gap:11px;background:var(--card);border-radius:14px;
+  padding:11px 13px;margin-bottom:8px;box-shadow:var(--sh);cursor:pointer}
+.c-av{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#0891b2,#0e7490);
+  color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;flex-shrink:0}
+.c-info{flex:1;min-width:0}
+.c-name{font-weight:800;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.c-phone{font-size:12.5px;color:var(--muted);direction:ltr;text-align:right}
+.c-due{text-align:center;flex-shrink:0;padding:4px 9px;border-radius:11px;min-width:62px}
+.c-due b{display:block;font-size:16px;font-weight:800;line-height:1.2}
+.c-due span{font-size:10px}
+.c-due.ok{background:rgba(22,163,74,.12);color:var(--green)}
+.c-due.warn{background:rgba(217,119,6,.14);color:var(--amber)}
+.c-due.bad{background:rgba(225,29,72,.13);color:var(--red)}
+
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-head b{font-size:16px}
+.navbtn{background:var(--card);border:1.5px solid var(--border);border-radius:11px;width:38px;height:38px;
+  font-size:18px;cursor:pointer;line-height:1}
+.cal-week{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px}
+.cal-week span{text-align:center;font-size:12px;color:var(--muted);font-weight:700}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cday{background:var(--card);border-radius:11px;min-height:56px;padding:5px 3px;text-align:center;
+  cursor:pointer;border:1.5px solid transparent;transition:.15s;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px}
+.cday:active{transform:scale(.95)}
+.cday.empty{background:transparent;cursor:default}
+.cday .cd-n{font-size:13px;font-weight:700}
+.cday .cd-p{font-size:9px;font-weight:700;line-height:1.2}
+.cday .cd-p.p{color:var(--green)} .cday .cd-p.n{color:var(--red)}
+.cday.today{border-color:var(--pri)}
+.cday.sel{background:var(--pri);color:#fff}
+.cday.sel .cd-p{color:#fff !important}
+
+.modal{position:fixed;inset:0;z-index:50;background:rgba(15,23,42,.55);display:none;
+  align-items:flex-end;justify-content:center;backdrop-filter:blur(2px)}
+.modal.open{display:flex}
+.sheet{background:var(--card);width:100%;max-width:560px;border-radius:22px 22px 0 0;
+  padding:16px 16px calc(20px + env(safe-area-inset-bottom));max-height:92vh;overflow-y:auto;
+  animation:up .25s cubic-bezier(.2,.8,.3,1)}
+@keyframes up{from{transform:translateY(60px);opacity:.4}to{transform:none;opacity:1}}
+@media(min-width:600px){.modal{align-items:center}.sheet{border-radius:22px}}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.sheet-head b{font-size:16.5px}
+.x{background:#f1f5f9;border:0;width:32px;height:32px;border-radius:50%;font-size:19px;cursor:pointer;
+  line-height:1;color:var(--muted)}
+@media (prefers-color-scheme: dark){.x{background:#1c2942}}
+.form label{display:block;font-size:12.5px;color:var(--muted);margin:11px 3px 5px;font-weight:600}
+.form .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{width:100%;border:0;border-radius:13px;padding:13px;font-weight:800;font-size:15px;
+  cursor:pointer;margin-top:16px;transition:.15s}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:linear-gradient(135deg,#0891b2,#0e7490);color:#fff;box-shadow:0 4px 14px rgba(8,145,178,.3)}
+.btn.ghost{background:#f1f5f9;color:var(--text);margin-top:8px}
+.btn.danger{background:rgba(225,29,72,.1);color:var(--red);margin-top:8px}
+@media (prefers-color-scheme: dark){.btn.ghost{background:#1c2942}}
+.dateInput{width:100%;text-align:right;background:var(--card);border:1.5px solid var(--border);
+  border-radius:12px;padding:11px 13px;cursor:pointer;font-weight:600}
+
+#picker{z-index:70}
+.phead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.phead b{font-size:15.5px}
+.phead button{background:var(--card);border:1.5px solid var(--border);border-radius:10px;width:36px;
+  height:36px;font-size:17px;cursor:pointer}
+.pweek{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px}
+.pweek span{text-align:center;font-size:12px;color:var(--muted);font-weight:700}
+.pgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.pcell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:10px;
+  cursor:pointer;font-size:14px;font-weight:600;background:#f8fafc}
+@media (prefers-color-scheme: dark){.pcell{background:#1a2438}}
+.pcell.empty{background:transparent;cursor:default}
+.pcell.today{border:1.5px solid var(--pri);color:var(--pri)}
+.pcell:active{background:var(--pri);color:#fff}
+
+.dname{font-size:19px;font-weight:800;margin-bottom:6px}
+.dbox{background:#f8fafc;border-radius:13px;padding:11px 13px;margin:9px 0;font-size:14px}
+@media (prefers-color-scheme: dark){.dbox{background:#1a2438}}
+.drow{display:flex;gap:8px;align-items:flex-start;margin:7px 0;font-size:14px}
+.drow .ic{flex-shrink:0}
+.hist-item{border-right:3px solid var(--pri);padding:6px 11px;margin-bottom:9px;background:#f8fafc;border-radius:0 11px 11px 0}
+@media (prefers-color-scheme: dark){.hist-item{background:#1a2438}}
+.hist-item .hd{font-weight:700;font-size:13.5px}
+.hist-item .hs{font-size:12px;color:var(--muted)}
+.pill{display:inline-block;padding:3px 11px;border-radius:20px;font-size:12px;font-weight:700}
+.pill.ok{background:rgba(22,163,74,.13);color:var(--green)}
+.pill.warn{background:rgba(217,119,6,.15);color:var(--amber)}
+.pill.bad{background:rgba(225,29,72,.13);color:var(--red)}
+
+nav.tabbar{position:fixed;bottom:0;left:0;right:0;z-index:30;background:var(--card);
+  border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(4,1fr);
+  padding:6px 4px calc(6px + env(safe-area-inset-bottom));max-width:640px;margin:0 auto;
+  box-shadow:0 -3px 18px rgba(15,23,42,.07)}
+nav.tabbar button{background:transparent;border:0;display:flex;flex-direction:column;align-items:center;
+  gap:2px;padding:7px 2px;border-radius:12px;cursor:pointer;color:var(--muted);font-size:10.5px;
+  font-weight:700;transition:.15s}
+nav.tabbar button .ic{font-size:19px;line-height:1}
+nav.tabbar button.on{color:var(--pri);background:rgba(8,145,178,.09)}
+
+.fab{position:fixed;bottom:calc(80px + env(safe-area-inset-bottom));left:18px;z-index:29;
+  width:56px;height:56px;border-radius:19px;border:0;background:linear-gradient(135deg,#0891b2,#0e7490);
+  color:#fff;font-size:28px;line-height:1;cursor:pointer;box-shadow:0 6px 20px rgba(8,145,178,.45);
+  display:flex;align-items:center;justify-content:center;transition:.15s}
+.fab:active{transform:scale(.92)}
+.search{position:relative;margin-bottom:10px}
+.search input{padding-right:38px}
+.search .ic{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.row-btns{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}
+.toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:#0f172a;color:#fff;padding:11px 22px;border-radius:30px;font-size:13.5px;font-weight:600;
+  opacity:0;pointer-events:none;transition:.28s;z-index:99;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.offline-badge{position:fixed;top:8px;left:8px;background:var(--amber);color:#fff;padding:4px 10px;
+  border-radius:20px;font-size:11px;font-weight:700;z-index:40;display:none}
+.offline-badge.show{display:block}
+</style>
+</head>
+<body>
+
+<div class="offline-badge" id="offlineBadge">📵 حالت آفلاین</div>
+
+<header class="app">
+  <div class="hrow">
+    <div>
+      <div class="brand">💧 آب‌پاک</div>
+      <div class="sub" id="hdrDate">—</div>
+    </div>
+    <div class="hstat">
+      <div class="hs-l">سود امروز</div>
+      <div class="hs-v" id="hdrProfit">۰ تومان</div>
+    </div>
+  </div>
+  <button id="installBtn">📲 نصب برنامه روی گوشی</button>
+</header>
+
+<main>
+  <section class="page active" id="page-dash">
+    <div class="grid3">
+      <div class="stat in"><span>درآمد امروز</span><b id="d-in">۰ تومان</b></div>
+      <div class="stat out"><span>هزینه امروز</span><b id="d-out">۰ تومان</b></div>
+      <div class="stat net"><span>سود امروز</span><b id="d-net">۰ تومان</b></div>
+    </div>
+
+    <h2 class="sec">📊 این ماه</h2>
+    <div class="grid3">
+      <div class="stat in"><span>درآمد</span><b id="m-in">۰ تومان</b></div>
+      <div class="stat out"><span>هزینه</span><b id="m-out">۰ تومان</b></div>
+      <div class="stat net"><span>سود</span><b id="m-net">۰ تومان</b></div>
+    </div>
+
+    <h2 class="sec">⏰ یادآور فیلتر امروز <span class="badge" id="dueCount">۰</span></h2>
+    <div id="dueList"></div>
+
+    <h2 class="sec">📅 سررسید ۷ روز آینده</h2>
+    <div id="soonList"></div>
+
+    <div class="row-btns">
+      <button class="btn ghost" id="btnExport" style="margin-top:14px">📤 پشتیبان‌گیری</button>
+      <button class="btn ghost" id="btnImport" style="margin-top:14px">📥 بازیابی</button>
+    </div>
+    <input type="file" id="fileImport" accept="application/json" hidden>
+  </section>
+
+  <section class="page" id="page-tx">
+    <div class="seg" id="txSeg">
+      <button class="on" data-v="all">همه</button>
+      <button data-v="in">درآمد</button>
+      <button data-v="out">هزینه</button>
+    </div>
+    <div id="txList"></div>
+  </section>
+
+  <section class="page" id="page-cust">
+    <div class="search">
+      <span class="ic">🔍</span>
+      <input id="cSearch" placeholder="جستجوی نام، شماره یا آدرس...">
+    </div>
+    <div id="custList"></div>
+  </section>
+
+  <section class="page" id="page-cal">
+    <div class="card">
+      <div class="cal-head">
+        <button class="navbtn" id="calPrev">‹</button>
+        <b id="calTitle">—</b>
+        <button class="navbtn" id="calNext">›</button>
+      </div>
+      <div class="cal-week">
+        <span>ش</span><span>ی</span><span>د</span><span>س</span><span>چ</span><span>پ</span><span>ج</span>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+    <div class="grid3" style="margin-bottom:12px">
+      <div class="stat in"><span>درآمد ماه</span><b id="c-in">۰ تومان</b></div>
+      <div class="stat out"><span>هزینه ماه</span><b id="c-out">۰ تومان</b></div>
+      <div class="stat net"><span>سود ماه</span><b id="c-net">۰ تومان</b></div>
+    </div>
+    <h2 class="sec" id="calDayTitle">روز انتخاب‌شده</h2>
+    <div id="calDayList"></div>
+  </section>
+</main>
+
+<button class="fab" id="fab">+</button>
+
+<nav class="tabbar">
+  <button class="on" data-tab="dash"><span class="ic">🏠</span>داشبورد</button>
+  <button data-tab="tx"><span class="ic">📋</span>تراکنش‌ها</button>
+  <button data-tab="cust"><span class="ic">👥</span>مشتری‌ها</button>
+  <button data-tab="cal"><span class="ic">📅</span>تقویم</button>
+</nav>
+
+<div class="modal" id="modal">
+  <div class="sheet">
+    <div class="sheet-head">
+      <b id="modalTitle"></b>
+      <button class="x" id="modalClose">×</button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<div class="modal" id="picker">
+  <div class="sheet">
+    <div id="pickerBody"></div>
+    <button class="btn ghost" id="pickerClose">بستن</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ========== ثبت Service Worker ========== */
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('✅ SW registered:', reg.scope))
+      .catch(err => console.warn('❌ SW failed:', err));
+  });
+}
+
+/* ========== نمایش وضعیت آفلاین ========== */
+function updateOnlineStatus(){
+  const b = document.getElementById('offlineBadge');
+  if (navigator.onLine) b.classList.remove('show');
+  else b.classList.add('show');
+}
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+updateOnlineStatus();
+
+/* ========== ابزارهای تاریخ شمسی ========== */
+const BREAKS = [-61,9,38,199,426,686,756,818,1111,1181,1210,1635,2060,2097,2192,2262,2324,2394,2456,3178];
+const idiv = (a,b) => Math.trunc(a/b);
+const imod = (a,b) => a - Math.trunc(a/b)*b;
+
+function jalCal(jy){
+  const bl = BREAKS.length, gy = jy + 621;
+  let leapJ = -14, jp = BREAKS[0], jump = 0;
+  if (jy < jp || jy >= BREAKS[bl-1]) throw new Error('سال خارج از محدوده: ' + jy);
+  for (let i=1;i<bl;i++){
+    const jm = BREAKS[i];
+    jump = jm - jp;
+    if (jy < jm) break;
+    leapJ = leapJ + idiv(jump,33)*8 + idiv(imod(jump,33),4);
+    jp = jm;
+  }
+  let n = jy - jp;
+  leapJ = leapJ + idiv(n,33)*8 + idiv(imod(n,33)+3,4);
+  if (imod(jump,33) === 4 && jump - n === 4) leapJ += 1;
+  const leapG = idiv(gy,4) - idiv((idiv(gy,100)+1)*3,4) - 150;
+  const march = 20 + leapJ - leapG;
+  if (jump - n < 6) n = n - jump + idiv(jump+4,33)*33;
+  let leap = imod(imod(n+1,33)-1,4);
+  if (leap === -1) leap = 4;
+  return { leap, gy, march };
+}
+function g2d(gy,gm,gd){
+  let d = idiv((gy + idiv(gm-8,6) + 100100)*1461,4)
+        + idiv(153*imod(gm+9,12)+2,5) + gd - 34840408;
+  d = d - idiv(idiv(gy + 100100 + idiv(gm-8,6),100)*3,4) + 752;
+  return d;
+}
+function d2g(jdn){
+  let j = 4*jdn + 139361631;
+  j = j + idiv(idiv(4*jdn + 183187720,146097)*3,4)*4 - 3908;
+  const i = idiv(imod(j,1461),4)*5 + 308;
+  const gd = idiv(imod(i,153),5) + 1;
+  const gm = imod(idiv(i,153),12) + 1;
+  const gy = idiv(j,1461) - 100100 + idiv(8-gm,6);
+  return { gy, gm, gd };
+}
+function j2d(jy,jm,jd){
+  const r = jalCal(jy);
+  return g2d(r.gy,3,r.march) + (jm-1)*31 - idiv(jm,7)*(jm-7) + jd - 1;
+}
+function d2j(jdn){
+  const gy = d2g(jdn).gy;
+  let jy = gy - 621;
+  const r = jalCal(jy);
+  const jdn1f = g2d(gy,3,r.march);
+  let k = jdn - jdn1f, jm, jd;
+  if (k >= 0){
+    if (k <= 185){ jm = 1 + idiv(k,31); jd = imod(k,31)+1; return {jy,jm,jd}; }
+    k -= 186;
+  } else {
+    jy -= 1; k += 179;
+    if (r.leap === 1) k += 1;
+  }
+  jm = 7 + idiv(k,30);
+  jd = imod(k,30)+1;
+  return { jy, jm, jd };
+}
+const isLeapJ = jy => jalCal(jy).leap === 0;
+function jMonthLen(jy,jm){
+  if (jm <= 6) return 31;
+  if (jm <= 11) return 30;
+  return isLeapJ(jy) ? 30 : 29;
+}
+
+/* ========== ابزارها ========== */
+const MONTHS = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+const WD_FULL = ['شنبه','یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنجشنبه','جمعه'];
+const FA = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+
+const $  = (s,r=document) => r.querySelector(s);
+const $$ = (s,r=document) => Array.from(r.querySelectorAll(s));
+const pad2 = n => String(n).padStart(2,'0');
+const uid  = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const toFa = s => String(s).replace(/\d/g, d => FA[+d]);
+const toEn = s => String(s).replace(/[۰-۹]/g, d => FA.indexOf(d));
+const esc  = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ========== نمایش مبلغ با کاما و واحد تومان ========== */
+function money(n){
+  const num = Math.abs(Math.round(n || 0));
+  const withComma = num.toLocaleString('en-US');   // 1,000,000
+  return toFa(withComma) + ' تومان';                // ۱,۰۰۰,۰۰۰ تومان
+}
+function moneyShort(n){
+  const a = Math.abs(n);
+  if (a >= 1e9) return toFa((n/1e9).toFixed(1)) + ' میلیارد';
+  if (a >= 1e6) return toFa((n/1e6).toFixed(1)) + ' میلیون';
+  if (a >= 1e3) return toFa(Math.round(n/1e3)) + ' هزار';
+  return toFa(n);
+}
+
+const parseJ = s => { const p = String(s).split('/').map(Number); return {jy:p[0], jm:p[1], jd:p[2]}; };
+const jStr  = o => `${o.jy}/${pad2(o.jm)}/${pad2(o.jd)}`;
+const jdnOf = s => { const p = parseJ(s); return j2d(p.jy,p.jm,p.jd); };
+const dayDiff = (a,b) => jdnOf(b) - jdnOf(a);
+function todayStr(){
+  const d = new Date();
+  return jStr(d2j(g2d(d.getFullYear(), d.getMonth()+1, d.getDate())));
+}
+function weekdayOf(s){
+  const p = parseJ(s);
+  const g = d2g(j2d(p.jy,p.jm,p.jd));
+  return (new Date(g.gy, g.gm-1, g.gd).getDay() + 1) % 7;
+}
+function faDateFull(s){
+  const p = parseJ(s);
+  return `${WD_FULL[weekdayOf(s)]} ${toFa(p.jd)} ${MONTHS[p.jm-1]} ${toFa(p.jy)}`;
+}
+function addJMonths(s, m){
+  const p = parseJ(s);
+  const total = p.jy*12 + (p.jm-1) + m;
+  const ny = Math.floor(total/12);
+  const nm = (total % 12) + 1;
+  const nd = Math.min(p.jd, jMonthLen(ny, nm));
+  return `${ny}/${pad2(nm)}/${pad2(nd)}`;
+}
+
+/* ========== ذخیره‌سازی ========== */
+const LS_KEY = 'abfapak_v2';
+let data = { transactions: [], customers: [] };
+
+function load(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw){
+      const p = JSON.parse(raw);
+      data.transactions = Array.isArray(p.transactions) ? p.transactions : [];
+      data.customers    = Array.isArray(p.customers) ? p.customers : [];
+    }
+  }catch(e){ console.warn('خطا در خواندن داده‌ها', e); }
+}
+function save(){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(data)); }
+  catch(e){ alert('ذخیره‌سازی ناموفق بود!'); }
+}
+
+/* ========== محاسبات ========== */
+function statsOf(dateStr){
+  let inc = 0, out = 0;
+  for (const t of data.transactions){
+    if (t.date === dateStr){
+      if (t.type === 'in') inc += +t.amount || 0;
+      else out += +t.amount || 0;
+    }
+  }
+  return { inc, out, net: inc - out };
+}
+function statsOfMonth(jy,jm){
+  const pre = `${jy}/${pad2(jm)}/`;
+  let inc = 0, out = 0;
+  for (const t of data.transactions){
+    if (typeof t.date === 'string' && t.date.startsWith(pre)){
+      if (t.type === 'in') inc += +t.amount || 0;
+      else out += +t.amount || 0;
+    }
+  }
+  return { inc, out, net: inc - out };
+}
+function dueDateOf(c){ return addJMonths(c.lastChange, c.interval || 6); }
+function dueInfo(c){
+  const due = dueDateOf(c);
+  const days = dayDiff(todayStr(), due);
+  let cls = 'ok', txt;
+  if (days < 0){ cls = 'bad'; txt = `${toFa(-days)} روز گذشته`; }
+  else if (days === 0){ cls = 'bad'; txt = 'همین امروز'; }
+  else if (days <= 7){ cls = 'warn'; txt = `${toFa(days)} روز مانده`; }
+  else { cls = 'ok'; txt = `${toFa(days)} روز مانده`; }
+  return { due, days, cls, txt };
+}
+
+/* ========== رندر ========== */
+function renderAll(){
+  renderHeader();
+  renderDash();
+  renderTx();
+  renderCust();
+  renderCal();
+}
+
+function renderHeader(){
+  const t = todayStr();
+  $('#hdrDate').textContent = faDateFull(t);
+  const s = statsOf(t);
+  $('#hdrProfit').textContent = moneyShort(s.net) + (s.net < 0 ? '‌-' : '');
+}
+
+function renderDash(){
+  const t = todayStr();
+  const p = parseJ(t);
+  const d = statsOf(t);
+  const m = statsOfMonth(p.jy, p.jm);
+  $('#d-in').textContent  = money(d.inc);
+  $('#d-out').textContent = money(d.out);
+  $('#d-net').textContent = money(d.net);
+  $('#m-in').textContent  = money(m.inc);
+  $('#m-out').textContent = money(m.out);
+  $('#m-net').textContent = money(m.net);
+
+  const due = data.customers
+    .map(c => ({ c, info: dueInfo(c) }))
+    .filter(x => x.info.days <= 0)
+    .sort((a,b) => a.info.days - b.info.days);
+
+  $('#dueCount').textContent = toFa(due.length);
+
+  $('#dueList').innerHTML = due.length ? due.map(({c, info}) => `
+    <div class="due-card">
+      <div style="min-width:0;flex:1">
+        <div class="dn">${esc(c.name)}</div>
+        <div class="dp">${c.phone ? toFa(c.phone) : '—'}</div>
+        <div class="da">${esc(c.address || 'بدون آدرس')}</div>
+        <div class="da" style="color:var(--red);font-weight:700">${info.txt}</div>
+      </div>
+      <div class="dactions">
+        ${c.phone ? `<a class="mini call" href="tel:${esc(c.phone)}">📞 تماس</a>` : ''}
+        <button class="mini ok" data-act="change" data-id="${c.id}">✅ تعویض شد</button>
+      </div>
+    </div>
+  `).join('') : `<div class="empty">امروز فیلتری برای تعویض نیست 🎉</div>`;
+
+  const soon = data.customers
+    .map(c => ({ c, info: dueInfo(c) }))
+    .filter(x => x.info.days > 0 && x.info.days <= 7)
+    .sort((a,b) => a.info.days - b.info.days);
+
+  $('#soonList').innerHTML = soon.length ? soon.map(({c, info}) => `
+    <div class="due-card soon">
+      <div style="min-width:0;flex:1">
+        <div class="dn">${esc(c.name)}</div>
+        <div class="dp">${c.phone ? toFa(c.phone) : '—'}</div>
+        <div class="da">${esc(c.address || 'بدون آدرس')}</div>
+      </div>
+      <div class="dactions">
+        <span class="pill warn">${info.txt}</span>
+        <button class="mini" data-act="cust" data-id="${c.id}">جزئیات</button>
+      </div>
+    </div>
+  `).join('') : `<div class="empty">موردی در ۷ روز آینده نیست</div>`;
+}
+
+let txFilter = 'all';
+function renderTx(){
+  let items = data.transactions.slice();
+  if (txFilter !== 'all') items = items.filter(t => t.type === txFilter);
+  items.sort((a,b) => jdnOf(b.date) - jdnOf(a.date) || (b.createdAt||0) - (a.createdAt||0));
+
+  const list = $('#txList');
+  if (!items.length){ list.innerHTML = `<div class="empty">تراکنشی ثبت نشده است</div>`; return; }
+
+  let lastDate = '';
+  list.innerHTML = items.map(t => {
+    let head = '';
+    if (t.date !== lastDate){
+      lastDate = t.date;
+      head = `<div class="sec" style="margin:16px 4px 8px">${faDateFull(t.date)}</div>`;
+    }
+    return head + `
+      <div class="tx ${t.type}">
+        <div class="tx-main">
+          <div class="tx-title">${esc(t.title || (t.type==='in' ? 'درآمد' : 'هزینه'))}</div>
+          <div class="tx-sub">${t.cat ? esc(t.cat) + ' • ' : ''}${t.type==='in' ? 'درآمد' : 'هزینه'}</div>
+        </div>
+        <div class="tx-amt">${t.type==='in' ? '+' : '−'} ${money(t.amount)}</div>
+        <button class="del" data-act="del-tx" data-id="${t.id}">🗑</button>
+      </div>`;
+  }).join('');
+}
+
+function renderCust(){
+  const q = ($('#cSearch').value || '').trim();
+  let list = data.customers.slice();
+  if (q) list = list.filter(c => ((c.name||'') + (c.phone||'') + (c.address||'')).includes(q));
+  list.sort((a,b) => jdnOf(dueDateOf(a)) - jdnOf(dueDateOf(b)));
+
+  const el = $('#custList');
+  if (!list.length){
+    el.innerHTML = `<div class="empty">${q ? 'موردی پیدا نشد' : 'هنوز مشتری‌ای ثبت نشده است'}<br><small>با دکمه + مشتری اضافه کنید</small></div>`;
+    return;
+  }
+  el.innerHTML = list.map(c => {
+    const info = dueInfo(c);
+    const initial = (c.name || '؟').trim().charAt(0);
+    const numTxt = info.days <= 0 ? toFa(Math.abs(info.days)) : toFa(info.days);
+    const lbl = info.days < 0 ? 'روز تأخیر' : info.days === 0 ? 'همین امروز' : 'روز مانده';
+    return `
+      <div class="cust" data-act="cust" data-id="${c.id}">
+        <div class="c-av">${esc(initial)}</div>
+        <div class="c-info">
+          <div class="c-name">${esc(c.name)}</div>
+          <div class="c-phone">${c.phone ? toFa(c.phone) : 'بدون شماره'}</div>
+        </div>
+        <div class="c-due ${info.cls}">
+          <b>${numTxt}</b>
+          <span>${lbl}</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+let calView = null;
+let calSel = null;
+
+function renderCal(){
+  if (!calView){
+    const t = parseJ(todayStr());
+    calView = { jy: t.jy, jm: t.jm };
+    calSel = todayStr();
+  }
+  const { jy, jm } = calView;
+  $('#calTitle').textContent = `${MONTHS[jm-1]} ${toFa(jy)}`;
+
+  const len = jMonthLen(jy, jm);
+  const g = d2g(j2d(jy, jm, 1));
+  const startWd = (new Date(g.gy, g.gm-1, g.gd).getDay() + 1) % 7;
+
+  let cells = '';
+  for (let i=0;i<startWd;i++) cells += `<div class="cday empty"></div>`;
+
+  const today = todayStr();
+  for (let d=1; d<=len; d++){
+    const ds = `${jy}/${pad2(jm)}/${pad2(d)}`;
+    const st = statsOf(ds);
+    const has = st.inc > 0 || st.out > 0;
+    let cls = 'cday';
+    if (ds === today) cls += ' today';
+    if (ds === calSel) cls += ' sel';
+    cells += `
+      <div class="${cls}" data-act="cal-day" data-date="${ds}">
+        <span class="cd-n">${toFa(d)}</span>
+        ${has ? `<span class="cd-p ${st.net >= 0 ? 'p' : 'n'}">${moneyShort(st.net)}</span>` : ''}
+      </div>`;
+  }
+  $('#calGrid').innerHTML = cells;
+
+  const ms = statsOfMonth(jy, jm);
+  $('#c-in').textContent  = money(ms.inc);
+  $('#c-out').textContent = money(ms.out);
+  $('#c-net').textContent = money(ms.net);
+
+  renderCalDay();
+}
+
+function renderCalDay(){
+  if (!calSel) return;
+  $('#calDayTitle').textContent = faDateFull(calSel);
+  const items = data.transactions
+    .filter(t => t.date === calSel)
+    .sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+
+  const st = statsOf(calSel);
+  const head = `<div class="card" style="display:flex;justify-content:space-between;text-align:center;gap:6px">
+      <div style="flex:1"><div style="font-size:11px;color:var(--muted)">درآمد</div>
+        <div style="font-weight:800;color:var(--green);font-size:12.5px">${money(st.inc)}</div></div>
+      <div style="flex:1"><div style="font-size:11px;color:var(--muted)">هزینه</div>
+        <div style="font-weight:800;color:var(--red);font-size:12.5px">${money(st.out)}</div></div>
+      <div style="flex:1"><div style="font-size:11px;color:var(--muted)">سود</div>
+        <div style="font-weight:800;color:var(--pri);font-size:12.5px">${money(st.net)}</div></div>
+    </div>`;
+
+  $('#calDayList').innerHTML = head + (items.length ? items.map(t => `
+    <div class="tx ${t.type}">
+      <div class="tx-main">
+        <div class="tx-title">${esc(t.title || (t.type==='in' ? 'درآمد' : 'هزینه'))}</div>
+        <div class="tx-sub">${t.cat ? esc(t.cat) : (t.type==='in' ? 'درآمد' : 'هزینه')}</div>
+      </div>
+      <div class="tx-amt">${t.type==='in' ? '+' : '−'} ${money(t.amount)}</div>
+    </div>`).join('') : `<div class="empty">این روز تراکنشی ندارد</div>`);
+}
+
+/* ========== مودال ========== */
+function openModal(title, html){
+  $('#modalTitle').textContent = title;
+  $('#modalBody').innerHTML = html;
+  $('#modal').classList.add('open');
+}
+function closeModal(){ $('#modal').classList.remove('open'); }
+$('#modalClose').onclick = closeModal;
+$('#modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+
+let toastTimer;
+function toast(msg){
+  const el = $('#toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+/* ========== انتخابگر تاریخ ========== */
+let pickerCtx = null;
+function openPicker(initial, cb){
+  const p = initial ? parseJ(initial) : parseJ(todayStr());
+  pickerCtx = { y: p.jy, m: p.jm, cb };
+  renderPicker();
+  $('#picker').classList.add('open');
+}
+function renderPicker(){
+  const { y, m } = pickerCtx;
+  const len = jMonthLen(y, m);
+  const g = d2g(j2d(y, m, 1));
+  const startWd = (new Date(g.gy, g.gm-1, g.gd).getDay() + 1) % 7;
+  const today = todayStr();
+
+  let cells = '';
+  for (let i=0;i<startWd;i++) cells += `<div class="pcell empty"></div>`;
+  for (let d=1; d<=len; d++){
+    const ds = `${y}/${pad2(m)}/${pad2(d)}`;
+    cells += `<div class="pcell${ds === today ? ' today' : ''}" data-d="${d}">${toFa(d)}</div>`;
+  }
+  $('#pickerBody').innerHTML = `
+    <div class="phead">
+      <button data-nav="-1">‹</button>
+      <b>${MONTHS[m-1]} ${toFa(y)}</b>
+      <button data-nav="1">›</button>
+    </div>
+    <div class="pweek"><span>ش</span><span>ی</span><span>د</span><span>س</span><span>چ</span><span>پ</span><span>ج</span></div>
+    <div class="pgrid">${cells}</div>
+    <button class="btn ghost" data-today="1" style="margin-top:14px">امروز</button>
+  `;
+}
+$('#pickerBody').addEventListener('click', e => {
+  const nav = e.target.closest('[data-nav]');
+  if (nav){
+    let { y, m } = pickerCtx;
+    m += Number(nav.dataset.nav);
+    if (m > 12){ m = 1; y++; }
+    if (m < 1){ m = 12; y--; }
+    pickerCtx.y = y; pickerCtx.m = m;
+    renderPicker();
+    return;
+  }
+  if (e.target.closest('[data-today]')){
+    pickerCtx.cb(todayStr());
+    $('#picker').classList.remove('open');
+    return;
+  }
+  const cell = e.target.closest('.pcell[data-d]');
+  if (cell){
+    const v = `${pickerCtx.y}/${pad2(pickerCtx.m)}/${pad2(Number(cell.dataset.d))}`;
+    pickerCtx.cb(v);
+    $('#picker').classList.remove('open');
+  }
+});
+$('#pickerClose').onclick = () => $('#picker').classList.remove('open');
+$('#picker').addEventListener('click', e => { if (e.target.id === 'picker') $('#picker').classList.remove('open'); });
+
+/* ========== فرم تراکنش ========== */
+function openTxForm(){
+  const t = todayStr();
+  openModal('ثبت تراکنش', `
+    <div class="form">
+      <div class="seg" id="txType">
+        <button class="on" data-v="in">💚 درآمد</button>
+        <button data-v="out">❤️ هزینه</button>
+      </div>
+      <label>مبلغ (تومان) *</label>
+      <input id="txAmount" type="tel" inputmode="numeric" placeholder="مثلاً 1000000">
+      <div id="txPreview" style="font-size:12.5px;color:var(--pri);font-weight:700;margin:4px 3px 0;min-height:18px"></div>
+      <label>تاریخ</label>
+      <button type="button" class="dateInput" id="txDate" data-value="${t}">${toFa(t)}</button>
+      <label>عنوان / شرح</label>
+      <input id="txTitle" placeholder="مثلاً: تعویض فیلتر آقای احمدی">
+      <label>دسته‌بندی</label>
+      <input id="txCat" placeholder="مثلاً: فروش، حمل‌ونقل، خرید لوازم">
+      <button class="btn primary" id="txSave">ذخیره</button>
+    </div>
+  `);
+
+  let type = 'in';
+  $('#txType').onclick = e => {
+    const b = e.target.closest('button[data-v]');
+    if (!b) return;
+    type = b.dataset.v;
+    $$('#txType button').forEach(x => x.classList.toggle('on', x === b));
+  };
+
+  const amt = $('#txAmount');
+  amt.addEventListener('input', () => {
+    const n = Number(toEn(amt.value).replace(/[^\d]/g,''));
+    $('#txPreview').textContent = n > 0 ? money(n) : '';
+  });
+
+  $('#txDate').onclick = () => openPicker($('#txDate').dataset.value, v => {
+    $('#txDate').dataset.value = v;
+    $('#txDate').textContent = toFa(v);
+  });
+
+  $('#txSave').onclick = () => {
+    const amount = Number(toEn($('#txAmount').value).replace(/[^\d]/g,''));
+    if (!amount || amount <= 0){ alert('مبلغ معتبر وارد کنید'); return; }
+    data.transactions.push({
+      id: uid(), type, amount,
+      date: $('#txDate').dataset.value,
+      title: $('#txTitle').value.trim(),
+      cat: $('#txCat').value.trim(),
+      createdAt: Date.now()
+    });
+    save(); closeModal(); renderAll();
+    toast(type === 'in' ? 'درآمد ثبت شد ✅' : 'هزینه ثبت شد ✅');
+  };
+  setTimeout(() => amt.focus(), 120);
+}
+
+/* ========== فرم مشتری ========== */
+function openCustomerForm(id){
+  const c = id ? data.customers.find(x => x.id === id) : null;
+  const t = todayStr();
+  openModal(c ? 'ویرایش مشتری' : 'مشتری جدید', `
+    <div class="form">
+      <label>نام و نام خانوادگی *</label>
+      <input id="cName" value="${esc(c?.name || '')}" placeholder="مثلاً: آقای احمدی">
+      <label>شماره تماس</label>
+      <input id="cPhone" type="tel" inputmode="tel" value="${esc(c?.phone || '')}" placeholder="09121234567">
+      <label>آدرس</label>
+      <textarea id="cAddr" rows="2" placeholder="شهر، خیابان، پلاک...">${esc(c?.address || '')}</textarea>
+      <label>نوع فیلتر دستگاه</label>
+      <input id="cFilter" value="${esc(c?.filterName || '')}" placeholder="مثلاً: فیلتر ۳ مرحله‌ای + ممبران">
+      <div class="two">
+        <div>
+          <label>تاریخ آخرین تعویض</label>
+          <button type="button" class="dateInput" id="cDate" data-value="${c?.lastChange || t}">${toFa(c?.lastChange || t)}</button>
+        </div>
+        <div>
+          <label>دوره تعویض (ماه)</label>
+          <input id="cInterval" type="tel" inputmode="numeric" value="${c?.interval || 6}">
+        </div>
+      </div>
+      <label>یادداشت</label>
+      <input id="cNote" value="${esc(c?.note || '')}" placeholder="مثلاً: طبقه ۳، واحد ۷">
+      <button class="btn primary" id="cSave">ذخیره</button>
+      ${c ? `<button class="btn danger" id="cDel">🗑 حذف مشتری</button>` : ''}
+    </div>
+  `);
+
+  $('#cDate').onclick = () => openPicker($('#cDate').dataset.value, v => {
+    $('#cDate').dataset.value = v;
+    $('#cDate').textContent = toFa(v);
+  });
+
+  $('#cSave').onclick = () => {
+    const name = $('#cName').value.trim();
+    if (!name){ alert('نام مشتری الزامی است'); return; }
+    const interval = Math.max(1, parseInt(toEn($('#cInterval').value)) || 6);
+    const payload = {
+      name,
+      phone: toEn($('#cPhone').value.trim()),
+      address: $('#cAddr').value.trim(),
+      filterName: $('#cFilter').value.trim(),
+      lastChange: $('#cDate').dataset.value,
+      interval,
+      note: $('#cNote').value.trim()
+    };
+    if (c){
+      Object.assign(c, payload);
+      toast('اطلاعات ویرایش شد ✅');
+    } else {
+      data.customers.push(Object.assign({
+        id: uid(), history: [], createdAt: Date.now()
+      }, payload));
+      toast('مشتری اضافه شد ✅');
+    }
+    save(); closeModal(); renderAll();
+  };
+
+  if (c){
+    $('#cDel').onclick = () => {
+      if (!confirm('این مشتری و تمام سوابقش حذف شود؟')) return;
+      data.customers = data.customers.filter(x => x.id !== c.id);
+      save(); closeModal(); renderAll();
+      toast('مشتری حذف شد');
+    };
+  }
+}
+
+/* ========== جزئیات مشتری ========== */
+function openCustomerDetail(id){
+  const c = data.customers.find(x => x.id === id);
+  if (!c) return;
+  const info = dueInfo(c);
+  const hist = (c.history || []).slice().sort((a,b) => jdnOf(b.date) - jdnOf(a.date));
+
+  openModal('جزئیات مشتری', `
+    <div class="dname">${esc(c.name)}</div>
+    <span class="pill ${info.cls}">${info.txt} — سررسید: ${toFa(info.due)}</span>
+
+    <div class="dbox">
+      <div class="drow"><span class="ic">📞</span>
+        <span>${c.phone ? `<a href="tel:${esc(c.phone)}" style="color:var(--pri);font-weight:700;direction:ltr;display:inline-block">${toFa(c.phone)}</a>` : 'ثبت نشده'}</span>
+      </div>
+      <div class="drow"><span class="ic">📍</span><span>${esc(c.address || 'ثبت نشده')}</span></div>
+      <div class="drow"><span class="ic">🧪</span><span>${esc(c.filterName || 'نوع فیلتر ثبت نشده')}</span></div>
+      <div class="drow"><span class="ic">🔁</span><span>دوره تعویض: هر ${toFa(c.interval || 6)} ماه</span></div>
+      <div class="drow"><span class="ic">📅</span><span>آخرین تعویض: ${toFa(c.lastChange)} (${faDateFull(c.lastChange)})</span></div>
+      ${c.note ? `<div class="drow"><span class="ic">📝</span><span>${esc(c.note)}</span></div>` : ''}
+    </div>
+
+    <h2 class="sec" style="margin-top:14px">🗂 سابقه تعویض‌ها (${toFa(hist.length)})</h2>
+    ${hist.length ? hist.map(h => `
+      <div class="hist-item">
+        <div class="hd">${toFa(h.date)} — ${faDateFull(h.date)}</div>
+        <div class="hs">${esc(h.filter || c.filterName || 'تعویض فیلتر')}${h.note ? ' • ' + esc(h.note) : ''}</div>
+        ${h.amount ? `<div class="hs" style="color:var(--green);font-weight:700">مبلغ: ${money(h.amount)}</div>` : ''}
+      </div>`).join('') : `<div class="empty">سابقه‌ای ثبت نشده</div>`}
+
+    <button class="btn primary" id="doChange">✅ ثبت تعویض فیلتر جدید</button>
+    <button class="btn ghost" id="doEdit">✏️ ویرایش اطلاعات</button>
+  `);
+
+  $('#doChange').onclick = () => openChangeForm(c.id);
+  $('#doEdit').onclick = () => openCustomerForm(c.id);
+}
+
+/* ========== ثبت تعویض ========== */
+function openChangeForm(cid){
+  const c = data.customers.find(x => x.id === cid);
+  if (!c) return;
+  const t = todayStr();
+  const nextDue = addJMonths(t, c.interval || 6);
+
+  openModal('ثبت تعویض فیلتر', `
+    <div class="form">
+      <div class="dbox" style="margin-top:0">
+        <b>${esc(c.name)}</b><br>
+        <span style="font-size:13px;color:var(--muted)">${c.phone ? toFa(c.phone) : ''}</span>
+      </div>
+      <label>تاریخ تعویض</label>
+      <button type="button" class="dateInput" id="chDate" data-value="${t}">${toFa(t)}</button>
+      <div id="chNext" style="font-size:12.5px;color:var(--pri);font-weight:700;margin:6px 3px 0">
+        سررسید بعدی: ${toFa(nextDue)}
+      </div>
+      <label>فیلترهای تعویض‌شده</label>
+      <input id="chFilter" value="${esc(c.filterName || '')}" placeholder="مثلاً: فیلتر ۳ مرحله‌ای + ممبران">
+      <label>توضیحات</label>
+      <input id="chNote" placeholder="مثلاً: فشار آب کم بود، تنظیم شد">
+      <label>مبلغ دریافتی (اختیاری - به عنوان درآمد ثبت می‌شود)</label>
+      <input id="chAmount" type="tel" inputmode="numeric" placeholder="مثلاً 250000">
+      <div id="chAmountPreview" style="font-size:12.5px;color:var(--pri);font-weight:700;margin:4px 3px 0;min-height:18px"></div>
+      <button class="btn primary" id="chSave">ثبت تعویض و انتقال به دوره بعد</button>
+    </div>
+  `);
+
+  $('#chDate').onclick = () => openPicker($('#chDate').dataset.value, v => {
+    $('#chDate').dataset.value = v;
+    $('#chDate').textContent = toFa(v);
+    const nd = addJMonths(v, c.interval || 6);
+    $('#chNext').textContent = 'سررسید بعدی: ' + toFa(nd);
+  });
+
+  const amtEl = $('#chAmount');
+  amtEl.addEventListener('input', () => {
+    const n = Number(toEn(amtEl.value).replace(/[^\d]/g,''));
+    $('#chAmountPreview').textContent = n > 0 ? money(n) : '';
+  });
+
+  $('#chSave').onclick = () => {
+    const date = $('#chDate').dataset.value;
+    const filter = $('#chFilter').value.trim();
+    const note = $('#chNote').value.trim();
+    const amount = Number(toEn($('#chAmount').value).replace(/[^\d]/g,'')) || 0;
+
+    c.history = c.history || [];
+    c.history.push({ date, filter, note, amount, createdAt: Date.now() });
+    c.lastChange = date;
+    if (filter) c.filterName = filter;
+
+    if (amount > 0){
+      data.transactions.push({
+        id: uid(), type: 'in', amount, date,
+        title: `تعویض فیلتر ${c.name}`,
+        cat: 'تعویض فیلتر',
+        createdAt: Date.now()
+      });
+    }
+    save(); closeModal(); renderAll();
+    toast('تعویض ثبت شد — سررسید بعدی: ' + toFa(addJMonths(date, c.interval || 6)));
+  };
+}
+
+/* ========== رویدادها ========== */
+$$('nav.tabbar button').forEach(b => {
+  b.onclick = () => {
+    $$('nav.tabbar button').forEach(x => x.classList.toggle('on', x === b));
+    $$('.page').forEach(p => p.classList.toggle('active', p.id === 'page-' + b.dataset.tab));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+});
+
+$('#fab').onclick = () => {
+  const active = $('.page.active').id;
+  if (active === 'page-cust') openCustomerForm();
+  else openTxForm();
+};
+
+$('#txSeg').onclick = e => {
+  const b = e.target.closest('button[data-v]');
+  if (!b) return;
+  txFilter = b.dataset.v;
+  $$('#txSeg button').forEach(x => x.classList.toggle('on', x === b));
+  renderTx();
+};
+
+$('#cSearch').oninput = renderCust;
+
+$('#calPrev').onclick = () => {
+  calView.jm--; if (calView.jm < 1){ calView.jm = 12; calView.jy--; }
+  renderCal();
+};
+$('#calNext').onclick = () => {
+  calView.jm++; if (calView.jm > 12){ calView.jm = 1; calView.jy++; }
+  renderCal();
+};
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]');
+  if (!el) return;
+  const act = el.dataset.act;
+  const id = el.dataset.id;
+
+  if (act === 'del-tx'){
+    if (confirm('این تراکنش حذف شود؟')){
+      data.transactions = data.transactions.filter(t => t.id !== id);
+      save(); renderAll(); toast('حذف شد');
+    }
+  }
+  else if (act === 'cust'){ openCustomerDetail(id); }
+  else if (act === 'change'){ openChangeForm(id); }
+  else if (act === 'cal-day'){
+    calSel = el.dataset.date;
+    renderCal();
+  }
+});
+
+$('#btnExport').onclick = () => {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `abfapak-backup-${todayStr().replace(/\//g,'-')}.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+  toast('فایل پشتیبان ساخته شد');
+};
+$('#btnImport').onclick = () => $('#fileImport').click();
+$('#fileImport').onchange = e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try{
+      const p = JSON.parse(r.result);
+      if (!p.transactions || !p.customers) throw new Error('ساختار نامعتبر');
+      if (!confirm('داده‌های فعلی جایگزین می‌شوند. مطمئنید؟')) return;
+      data.transactions = p.transactions;
+      data.customers = p.customers;
+      save(); renderAll(); toast('بازیابی انجام شد ✅');
+    }catch(err){ alert('فایل نامعتبر است!'); }
+  };
+  r.readAsText(f);
+  e.target.value = '';
+};
+
+/* ========== نصب PWA ========== */
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  $('#installBtn').style.display = 'inline-block';
+});
+$('#installBtn').onclick = async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  $('#installBtn').style.display = 'none';
+};
+
+/* ========== راه‌اندازی ========== */
+load();
+renderAll();
+setInterval(() => { if ($('.page.active')?.id === 'page-dash') renderDash(); }, 60000);
+</script>
+</body>
+</html>
